@@ -1,5 +1,5 @@
 from socket import *
-serverName = 'servername'                           #Inserir IP da máquina
+serverName = 'localhost'                           #Inserir IP da máquina
 serverPort = 12000                                  #Inserir porta da máquina
 clientSocket = socket(AF_INET, SOCK_STREAM)
 clientSocket.connect((serverName, serverPort))
