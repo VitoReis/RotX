@@ -29,7 +29,6 @@ def encode(message):
             letter = message[i]
     return encoded
 
-
 ip = input('Type the server IP: ')
 port = int(input('Type the server port: '))
 message = encode(input('Input one lowercase word: '))

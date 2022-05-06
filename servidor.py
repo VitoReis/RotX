@@ -1,8 +1,6 @@
 from socket import *
 from struct import *
-import re
 import threading
-import time
 
 def decode(encoded):
     i = 0
