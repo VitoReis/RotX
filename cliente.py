@@ -42,7 +42,6 @@ clientSocket = socket(AF_INET, SOCK_STREAM)
 clientSocket.connect((ip, port))
 print(f'Sending to server: {message}, {size}')
 # clientSocket.send(pack('>I', size))
-
 clientSocket.send(message.encode())
 decodedMessage = clientSocket.recv(1024).decode()
 print(f'From server: {decodedMessage}')
@@ -51,5 +50,5 @@ clientSocket.close()
 #           A fazer:
 # Remover necessidade de .encode() se for obrigatorio
 # Conseguir desligar o servidor se for obrigatorio
-# Criar Threads
 # Enviar mesage e size junto
+# Pq precisa de enviar size?
