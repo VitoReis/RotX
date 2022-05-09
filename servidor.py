@@ -1,6 +1,7 @@
 from socket import *
 from struct import *
 import threading
+from _thread import *
 
 def decode(encoded):
     i = 0
@@ -21,6 +22,17 @@ def decode(encoded):
             letter = encoded[i]
     return decoded
 
+def thread(connectionSocket):
+    while True:
+        print('thread start')
+        message = connectionSocket.recv(1024).decode()
+        print(f'From client: {message}')
+        decoded = decode(message)
+        print(f'Sending to client: {decoded}')
+        connectionSocket.send(decoded.encode())
+        print('thread end')
+    connectionSocket.close()
+
 
 port = int(input('Insert the port: '))
 # port = 12000
@@ -30,12 +42,14 @@ serverSocket.listen(1)
 print('The server is ready to receive')
 while True:
     connectionSocket, addr = serverSocket.accept()
-    size = connectionSocket.recv(2048)
-    size = unpack('>I', size)[0] - 1
-    print(size)
-    message = connectionSocket.recv(1024).decode()
-    print(f'From client: {message}')
-    decoded = decode(message)
-    print(f'Sending to client: {decoded}')
-    connectionSocket.send(decoded.encode())
+    threading.Lock()
+    threading.Thread(target=thread, args=(connectionSocket,)).start()
+    # size = connectionSocket.recv(1024)
+    # size = unpack('>I', size)
+    # print(size)
+    # message = connectionSocket.recv(1024).decode()
+    # print(f'From client: {message}')
+    # decoded = decode(message)
+    # print(f'Sending to client: {decoded}')
+    # connectionSocket.send(decoded.encode())
     connectionSocket.close()

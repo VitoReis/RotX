@@ -29,19 +29,20 @@ def encode(message):
             letter = message[i]
     return encoded
 
-ip = input('Type the server IP: ')
-port = int(input('Type the server port: '))
-message = encode(input('Input one lowercase word: '))
-size = int(input('Insert the string size: '))
-# ip = 'localhost'
-# port = 12000
-# message = encode('stringdetest')
-# size = 1
+# ip = input('Type the server IP: ')
+# port = int(input('Type the server port: '))
+# message = encode(input('Input one lowercase word: '))
+# size = int(input('Insert the string size: '))
+ip = 'localhost'
+port = 12000
+message = encode('stringdetest')
+size = 1
 
 clientSocket = socket(AF_INET, SOCK_STREAM)
 clientSocket.connect((ip, port))
 print(f'Sending to server: {message}, {size}')
-clientSocket.send(pack('>I', size))
+# clientSocket.send(pack('>I', size))
+
 clientSocket.send(message.encode())
 decodedMessage = clientSocket.recv(1024).decode()
 print(f'From server: {decodedMessage}')
@@ -49,5 +50,6 @@ clientSocket.close()
 
 #           A fazer:
 # Remover necessidade de .encode() se for obrigatorio
-# Conseguir enviar size em pack('>i', size)
 # Conseguir desligar o servidor se for obrigatorio
+# Criar Threads
+# Enviar mesage e size junto
