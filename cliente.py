@@ -1,8 +1,9 @@
 from socket import *
 from struct import *
 import re
+import socket
 
-def encode(message):
+def encode(message, X):
     i = 0
     identifier = re.compile("^[a-z]+$")
 
@@ -16,11 +17,11 @@ def encode(message):
     while i < len(message):
         asciiNum = ord(letter)              # Retorna o valor ascii do caracter
 
-        if asciiNum + 3 > 122:              # Se passar de z(122) voltamos ao inicio a(97)
-            remnant = (asciiNum + 3) % 122
+        if asciiNum + X > 122:              # Se passar de z(122) voltamos ao inicio a(97)
+            remnant = (asciiNum + X) % 122
             asciiNum = 96 + remnant
         else:
-            asciiNum = asciiNum + 3         # Soma o valor ascii na letra
+            asciiNum = asciiNum + X         # Soma o valor ascii na letra
         encoded += chr(asciiNum)            # Retorna o caracter correspondente a letra original
         i += 1
         if i < len(message):                 # Se chegar ao fim da string o mesage[i] não existe
@@ -28,30 +29,21 @@ def encode(message):
     return encoded
 
 def main():
-    # ip = input('Type the server IP: ')
-    # port = int(input('Type the server port: '))
-    # message = encode(input('Input one lowercase word: '))
-    # X = int(input('Insert one integer: '))
-    ip = '127.0.0.1'
-    port = 5000
-    message = encode('stringdetest')
-    size = len(message)
-    X = 15
+    ip = input('Type the server IP: ')
+    port = int(input('Type the server port: '))
+    message = input('Input one lowercase word: ')
+    X = int(input('Insert the integer of the cipher: '))
+    message = encode(message, X)        # Codifica a mensagem
+    size = len(message)                 # Guarda o tamanho da string para o pack e unpack
+    message = message.encode()          # Transforma a string em bytes
 
-    clientSocket = socket(AF_INET, SOCK_STREAM)
+    clientSocket = socket.socket(AF_INET, SOCK_STREAM)
     clientSocket.connect((ip, port))
-    # clientSocket.send(pack('>I', size))
-    clientSocket.send(message.encode())
-    # clientSocket.send(pack('>I', X))
+    clientSocket.setsockopt(socket.SOL_SOCKET, socket.SO_RCVTIMEO, 15)      # Define o timeout de 15 seg
+    clientSocket.send(pack(f'>II{size}s', X, size, message))
     decodedMessage = clientSocket.recv(1024).decode()
     print(f'From server: {decodedMessage}')
     clientSocket.close()
 
 if __name__ == '__main__':
     main()
-
-#           A fazer:
-# Remover necessidade de .encode() se for obrigatorio
-# Conseguir desligar o servidor se for obrigatorio
-# Enviar size, message e X junto
-# Pq precisa de enviar size e o numero?
