@@ -2,6 +2,7 @@ from socket import *
 from struct import *
 import threading
 import socket
+import sys
 
 def decode(encoded, X):
     i = 0
@@ -30,15 +31,17 @@ def thread(connectionSocket):
     message = connectionSocket.recv(1024)       # Recebe o restante
     message = unpack(f'>{size}s', message)[0]   # Atribui o primeiro valor da tupla a message
     message = message.decode()                  # Transformas os bytes em string novamente
-
     decoded = decode(message, X)                    # Retira a cifra de Cesar
     print(f'Sending to client: {decoded}')          # Mostra a mensagem decodificada que será enviada de volta
-    connectionSocket.send(decoded.encode())
+    connectionSocket.send(pack(f'>{size}s', decoded.encode()))
     connectionSocket.close()
 
 def main():
     serverSocket = socket.socket(AF_INET, SOCK_STREAM)
-    port = int(input('Insert the port: '))
+    if len(sys.argv) == 2:
+        port = int(sys.argv[1])
+    else:
+        port = int(input('Insert the port: '))
     serverSocket.bind(('127.0.0.1', port))
     serverSocket.listen(1)
     print('The server is ready to receive')

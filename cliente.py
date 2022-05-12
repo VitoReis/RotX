@@ -2,6 +2,7 @@ from socket import *
 from struct import *
 import re
 import socket
+import sys
 
 def encode(message, X):
     i = 0
@@ -29,10 +30,17 @@ def encode(message, X):
     return encoded
 
 def main():
-    ip = input('Type the server IP: ')
-    port = int(input('Type the server port: '))
-    message = input('Input one lowercase word: ')
-    X = int(input('Insert the integer of the cipher: '))
+    if len(sys.argv) == 5:
+        ip = sys.argv[1]
+        port = int(sys.argv[2])
+        message = sys.argv[3]
+        X = int(sys.argv[4])
+    else:
+        ip = input('Type the server IP: ')
+        port = int(input('Type the server port: '))
+        message = input('Input one lowercase word: ')
+        X = int(input('Insert the integer of the cipher: '))
+
     message = encode(message, X)        # Codifica a mensagem
     size = len(message)                 # Guarda o tamanho da string para o pack e unpack
     message = message.encode()          # Transforma a string em bytes
@@ -41,7 +49,7 @@ def main():
     clientSocket.connect((ip, port))
     clientSocket.setsockopt(socket.SOL_SOCKET, socket.SO_RCVTIMEO, 15)      # Define o timeout de 15 seg
     clientSocket.send(pack(f'>II{size}s', X, size, message))
-    decodedMessage = clientSocket.recv(1024).decode()
+    decodedMessage = unpack(f'{size}s', clientSocket.recv(1024))[0].decode()
     print(f'From server: {decodedMessage}')
     clientSocket.close()
 
