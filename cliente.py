@@ -1,7 +1,6 @@
 from socket import *
 from struct import *
 import re
-import socket
 import sys
 
 def encode(message, X):
@@ -45,13 +44,17 @@ def main():
     size = len(message)                 # Guarda o tamanho da string para o pack e unpack
     message = message.encode()          # Transforma a string em bytes
 
-    clientSocket = socket.socket(AF_INET, SOCK_STREAM)
+    clientSocket = socket(AF_INET, SOCK_STREAM)
     clientSocket.connect((ip, port))
-    clientSocket.setsockopt(socket.SOL_SOCKET, socket.SO_RCVTIMEO, 15)      # Define o timeout de 15 seg
-    clientSocket.send(pack(f'>II{size}s', X, size, message))
-    decodedMessage = unpack(f'{size}s', clientSocket.recv(1024))[0].decode()
-    print(f'From server: {decodedMessage}')
-    clientSocket.close()
+    clientSocket.settimeout(15)
+    try:
+        clientSocket.send(pack(f'>II{size}s', X, size, message))
+        decodedMessage = unpack(f'{size}s', clientSocket.recv(1024))[0].decode()
+        print(f'From server: {decodedMessage}')
+        clientSocket.close()
+    except clientSocket.timeout as e:
+        print(e)
+        clientSocket.close()
 
 if __name__ == '__main__':
     main()
